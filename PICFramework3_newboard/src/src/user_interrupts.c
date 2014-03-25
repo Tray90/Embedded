@@ -64,13 +64,40 @@ void timer1_int_handler() {
 
 void adc_int_handler(){
 
-    if(adcbuffer[0] < 27)                 // increment counter
+    // adcbuffer[0] stores the count
+    if(adcbuffer[0] < 3)                 // increment counter
         adcbuffer[0] = adcbuffer[0] + 1;
-//    else {                               // shift out first value
-//        for (int i = 1; i < 27; i++)
-//        {
-//            adcbuffer[i] = adcbuffer[i+1];
-//        }
-//    }
-    adcbuffer[adcbuffer[0]] = ADRESH;    // put value in current count
+    else
+        adcbuffer[0] = 1;
+        
+    // Converts ADRESH to a voltage    
+    int k = (int)ADRESH;
+    float voltage = 3.4*k/256;
+    int roundDist;
+    
+    // If the voltage is larger than .5 V this runs it through a simplifed equation to return the approximate distance
+    // WARNING:  This equation is not completely accurate so results may vary until it is improved
+    if (voltage > .5) {
+        float dist = 24/(voltage - 0.1);
+        roundDist = (int)(dist + 0.5);
+    }
+    // If the voltage is too small then the object is assumed to be too far away so we send back 0xFF
+    else
+        roundDist = 0xFF;
+
+    // Reads the current channel from the count of the adcbuffer[0]
+    // Puts the current distance of the respective sensor in the adcbuffer then changes to the next channel
+    int channel = (int)adcbuffer[0] % 3;
+    if (channel == 0) {
+        adcbuffer[3] = roundDist;
+        SetChanADC(ADC_CH1);
+    }
+    else if (channel == 1) {
+        adcbuffer[1] = roundDist;
+        SetChanADC(ADC_CH2);
+    }
+    else {
+        adcbuffer[2] = roundDist;
+        SetChanADC(ADC_CH3);
+    }
 }
