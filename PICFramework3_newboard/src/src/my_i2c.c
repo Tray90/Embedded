@@ -410,9 +410,24 @@ void i2c_slave_int_handler() {
         //ToMainHigh_sendmsg(0, MSGT_I2C_RQST, (void *) ic_ptr->buffer);
         if(ic_ptr->buffer[0] == 0xAA){
             length = 5;
+
+            // Creates the message type and bitmask char values
+            unsigned char messageType = 0x01, bitmask = 0x17, checksum;
             
-            unsigned char sensormsg[5] = {0x01, 0x01, 0x02, 0x03, ((0x01 + 0x02 + 0x03) & 0x17)};
-            start_i2c_slave_reply(length, sensormsg);
+            // This will hold the message that we want the slave to send
+            unsigned char message[5];
+            
+            // Stores the appropriate values in the message to be sent
+            message[0] = messageType;
+            message[1] = adcbuffer[1];
+            message[2] = adcbuffer[2];
+            message[3] = adcbuffer[3];
+            
+            // Creates the checksum
+            checksum = message[1] + message[2] + message[3];
+            message[4] = checksum & bitmask;
+
+            start_i2c_slave_reply(length, message);
             //adcbuffer[0] = 0; // reset count after send
         } else if(ic_ptr->buffer[0] == 0xBA){
             // motor stuff
