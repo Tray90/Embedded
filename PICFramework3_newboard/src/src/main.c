@@ -254,12 +254,13 @@ void main(void) {
     // initialize Timers
 
 #ifdef MOTORPIC
-    ////////////////////////////Tray////////////////////////////////
+    ///////////////////////////////////////////////Tray//////////////////////////////////////////////////////////////
     //OpenTimer0(TIMER_INT_ON & T0_8BIT & T0_SOURCE_INT & TO_EDGE_RISE & T0_PS_1_256);
     // Timer 0 is currently running way faster than the sensors updated their value so it should be switched
     // to one resembling the on above unless the faster timer is needed for something else
     // The timer above should trigger an interrupt about every 5 ms so sensor data should be taken once every third
     // interrupt in order to pole at the fastest reasonable speed and still retrieve new data each time
+    ////////////////////////////Tray///////////////Tray//////////////////////////////////////////////////////////////
     
     PORTAbits.AN0 = 1;
     OpenTimer0(TIMER_INT_ON & T0_8BIT & T0_SOURCE_EXT & T0_EDGE_RISE & T0_PS_1_1);
